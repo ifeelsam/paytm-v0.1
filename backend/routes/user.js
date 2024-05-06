@@ -1,6 +1,6 @@
 import express, { Router } from "express";
 import JWT_SECRET from "../config";
-import {User} from '../db'; 
+import {Account, User} from '../db'; 
 import authMiddleware from "../middleware.js"
 import jwt from "jsonwebtoken"
 const zod = require("zod");
@@ -20,8 +20,7 @@ router.post("/signup", async (req, res) => {
       message: "incorrect email/ already taken"
     })
   }
-  
-  
+   
   const user = User.findOne({
     username: body.username
   })
@@ -29,7 +28,7 @@ router.post("/signup", async (req, res) => {
   if (user._id){
     return res.json({
       message: "email already taken"
-     })
+    })
   }
 
   const dbUser = await User.create({
@@ -38,8 +37,15 @@ router.post("/signup", async (req, res) => {
     firstName: body.firstName,
     lastName: body.lastName
   });
+  const userId = dbUser._id
+
+  await Account.create({
+    userId,
+    balance: 1 + Math.random() * 10000,
+  })
+
   const token = jwt.sign({
-    userID: dbUser._id
+    userId: dbUser._id
   }, JWT_SECRET)
 
 
@@ -101,6 +107,7 @@ router.put("/", authMiddleware, async (req, res) => {
 })
  
 router.post("/bullk", async (req, res) => {
+  const filter = req.query.filter || "";
   const users = await User.find({
     $or: [{
       firstName: {
