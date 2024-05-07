@@ -27,7 +27,7 @@ const userSchema = new Schema({
     minLength: 3,
     maxLength: 30,
   },
-  LastName: {
+  lastName: {
     type: String,
     required: true,
     trim: true,
@@ -35,6 +35,7 @@ const userSchema = new Schema({
   }
 })
 
+export const User = mongoose.model("User", userSchema);
 const accountSchema = new Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -43,10 +44,9 @@ const accountSchema = new Schema({
   },
   balance: {
     type: Number,
-    required:true,
+    required: true,
   }
 })
 
-export const User = mongoose.model("User", userSchema);
 export const Account = mongoose.model("Account", accountSchema)
 
